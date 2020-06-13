@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
-        <activity android:name=".TypePageActivity"
+        <activity android:name=".pages.TypePageActivity"
             android:label="FavPokemon"
             android:launchMode="singleTop">
             <meta-data
@@ -30,7 +30,7 @@
         </provider>
 
         <activity
-            android:name=".FavoritePokemon"
+            android:name=".pages.FavoritePokemon"
             android:label="FavPokemon"
             android:launchMode="singleTop">
             <meta-data
@@ -38,7 +38,7 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".LocationPageActivity"
+            android:name=".pages.LocationPageActivity"
             android:label="Loc"
             android:launchMode="singleTop">
             <meta-data
@@ -46,7 +46,7 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".ItemPageActivity"
+            android:name=".pages.ItemPageActivity"
             android:label="Item"
             android:launchMode="singleTop">
             <meta-data
@@ -55,6 +55,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -63,7 +64,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PokemonPageActivity"
+            android:name=".pages.PokemonPageActivity"
             android:label="Pokemon"
             android:launchMode="singleTop">
             <meta-data

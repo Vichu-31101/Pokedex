@@ -11,9 +11,19 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.example.pokedexv2.database.PokemonDatabase
+import com.example.pokedexv2.pages.FavoritePokemon
+import com.example.pokedexv2.pages.ItemPageActivity
+import com.example.pokedexv2.pages.LocationPageActivity
+import com.example.pokedexv2.pages.PokemonPageActivity
+import com.google.gson.GsonBuilder
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.row_layout.view.*
+import okhttp3.*
+import java.io.IOException
 import java.util.*
+import java.util.logging.Handler
 
 
 class MainAdapter(var pokemonList: PokemonList, val activity: Activity, val option: Int): RecyclerView.Adapter<CustomViewHolder>() {
@@ -63,17 +73,48 @@ class MainAdapter(var pokemonList: PokemonList, val activity: Activity, val opti
     fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
+                var types = arrayListOf<String>("normal","fighting","flying","poison","ground","rock","bug","ghost","steel","fire","water","grass","electric","psychic","ice","dark","dragon","fairy","unknown","shadow")
+                var typeSearch = false
                 val charSearch = constraint.toString()
+                var str = types.filter {
+                    it.toLowerCase(Locale.ROOT) == charSearch!!.toLowerCase(Locale.ROOT)
+                }
                 if (charSearch.isEmpty()) {
                    pokemonList=  pokemonList
-                } else {
+                }
+                else if(str.isNotEmpty()){
+                    typeSearch = true
+                    Log.d("hello","loi")
+                    pokemonList.results.clear()
+                    fetchPokemonList(str[0]){
+                        pokemonType ->
+
+                        for(i in pokemonType.pokemon){
+                            pokemonList.results.add(i.pokemon)
+                        }
+                        var bUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"
+                        var eUrl = ".png"
+                        for(i in (0 until (pokemonList.results.size)))
+                        {
+                            var mUrl = pokemonList.results[i].url.filter { it.isDigit() }.substring(1)
+                            var spUrl = bUrl+mUrl+eUrl
+                            pokemonList.results[i].sprite_url = spUrl
+                        }
+
+                    }
+                    Thread.sleep(200)
+                }
+                else {
                     pokemonList.results = pokemonList.results.filter {
-                        it.name.toLowerCase(Locale.ROOT).contains(charSearch.toLowerCase(Locale.ROOT)) || ((pokemonList.results.indexOf(it)+1).toString() == charSearch.toLowerCase(Locale.ROOT) && charSearch.toLowerCase(Locale.ROOT).length == (pokemonList.results.indexOf(it)+1).toString().length)
+                        it.name.toLowerCase(Locale.ROOT).contains(charSearch.toLowerCase(Locale.ROOT)) || ((pokemonList.results.indexOf(it)+1).toString() == charSearch.toLowerCase(Locale.ROOT))
                     } as MutableList<Result>
                 }
                 val filterResults = FilterResults()
                 filterResults.values = pokemonList
 
+                if(typeSearch){
+
+                }
                 return filterResults
             }
 
@@ -90,6 +131,31 @@ class MainAdapter(var pokemonList: PokemonList, val activity: Activity, val opti
         }
     }
 
+    fun fetchPokemonList(type: String, resultHandler: (PokemonType) -> Unit){
+        println("Connecting")
+
+        val bUrl: String = "https://pokeapi.co/api/v2/type/"
+
+        val url = bUrl + type
+
+        val request = Request.Builder().url(url).build()
+
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object: Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                println("Failed")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val body =  response.body?.string()
+                println(body)
+
+                val gson = GsonBuilder().create()
+
+                resultHandler(gson.fromJson(body, PokemonType::class.java))
+            }
+        })
+    }
 
 
 

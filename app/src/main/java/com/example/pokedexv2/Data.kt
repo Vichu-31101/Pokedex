@@ -2,7 +2,7 @@ package com.example.pokedexv2
 
 class PokemonList(var results: MutableList<Result>)
 
-class Result(val name: String, val url: String, var sprite_url: String, var image: ByteArray? = null)
+class Result(val name: String, val url: String, var sprite_url: String, var image: ByteArray? = null, var id: Int = 0, var type: String = " ")
 
 class Pokemon(val sprites: PokemonSprite, val types: List<Type>, val id: Int, val height: Int, val weight: Int, val species: Species, val stats: List<Stat>)
 

@@ -2,18 +2,22 @@ package com.example.pokedexv2
 
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.pokedexv2.database.PokemonDatabase
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
 import java.io.IOException
+import java.util.*
 
 
 @Suppress("DEPRECATION")
@@ -35,8 +39,10 @@ class MainActivity : AppCompatActivity()  {
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(toolbar)
         fetchPokemonList(option)
 
+       // SearchFilter.visibility = View.GONE
 
 
         layoutManager = LinearLayoutManager(this)
@@ -58,6 +64,7 @@ class MainActivity : AppCompatActivity()  {
         val toggle = ActionBarDrawerToggle(this, Drawer, R.string.open, R.string.close)
         Drawer.addDrawerListener(toggle)
         toggle.syncState()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         NavView.setNavigationItemSelectedListener {
             when (it.itemId) {
@@ -106,6 +113,7 @@ class MainActivity : AppCompatActivity()  {
         SearchFilter.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 progressBar.visibility = View.GONE
+
                 adapter.getFilter().filter(query)
                 return false
             }
@@ -135,6 +143,16 @@ class MainActivity : AppCompatActivity()  {
             false
         }
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return  when(item.itemId){
+            android.R.id.home -> {
+                Drawer.openDrawer(GravityCompat.START)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 
@@ -200,6 +218,8 @@ class MainActivity : AppCompatActivity()  {
                         var mUrl = pokemonList.results[i].url.filter { it.isDigit() }.substring(1)
                         var spUrl = bUrl+mUrl+eUrl
                         pokemonList.results[i].sprite_url = spUrl
+
+
                     }
                 }
                 else if(option == 2){
