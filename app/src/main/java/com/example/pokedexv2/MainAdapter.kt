@@ -74,7 +74,7 @@ class MainAdapter(var pokemonList: PokemonList, val activity: Activity, val opti
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 var types = arrayListOf<String>("normal","fighting","flying","poison","ground","rock","bug","ghost","steel","fire","water","grass","electric","psychic","ice","dark","dragon","fairy","unknown","shadow")
-                var typeSearch = false
+                var recieved = false
                 val charSearch = constraint.toString()
                 var str = types.filter {
                     it.toLowerCase(Locale.ROOT) == charSearch!!.toLowerCase(Locale.ROOT)
@@ -83,7 +83,6 @@ class MainAdapter(var pokemonList: PokemonList, val activity: Activity, val opti
                    pokemonList=  pokemonList
                 }
                 else if(str.isNotEmpty()){
-                    typeSearch = true
                     Log.d("hello","loi")
                     pokemonList.results.clear()
                     fetchPokemonList(str[0]){
@@ -100,9 +99,13 @@ class MainAdapter(var pokemonList: PokemonList, val activity: Activity, val opti
                             var spUrl = bUrl+mUrl+eUrl
                             pokemonList.results[i].sprite_url = spUrl
                         }
+                        recieved = true
 
                     }
-                    Thread.sleep(200)
+                    while(!recieved){
+                        Thread.sleep(100)
+                    }
+
                 }
                 else {
                     pokemonList.results = pokemonList.results.filter {
@@ -112,9 +115,7 @@ class MainAdapter(var pokemonList: PokemonList, val activity: Activity, val opti
                 val filterResults = FilterResults()
                 filterResults.values = pokemonList
 
-                if(typeSearch){
 
-                }
                 return filterResults
             }
 

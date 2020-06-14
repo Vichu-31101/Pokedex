@@ -1,23 +1,33 @@
 package com.example.pokedexv2
 
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.SearchView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.core.view.GravityCompat
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.pokedexv2.database.PokemonDatabase
 import com.google.gson.GsonBuilder
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
 import java.io.IOException
-import java.util.*
 
 
 @Suppress("DEPRECATION")
@@ -30,7 +40,7 @@ class MainActivity : AppCompatActivity()  {
     var searching = false
 
 
-
+    lateinit var pokemonList: PokemonList
     lateinit var adapter: MainAdapter
     lateinit var layoutManager: LinearLayoutManager
 
@@ -75,6 +85,7 @@ class MainActivity : AppCompatActivity()  {
                     Drawer.closeDrawers()
                     it.isChecked = false
                     fetchPokemonList(option)
+
                     true
                 }
                 R.id.items -> {
@@ -143,11 +154,18 @@ class MainActivity : AppCompatActivity()  {
             false
         }
 
+
     }
+
+
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return  when(item.itemId){
             android.R.id.home -> {
+                SearchFilter.setQuery("",true)
+                SearchFilter.isIconified = true
+
                 Drawer.openDrawer(GravityCompat.START)
                 true
             }
@@ -205,7 +223,7 @@ class MainActivity : AppCompatActivity()  {
                 println(body)
 
                 val gson = GsonBuilder().create()
-                lateinit var pokemonList: PokemonList
+
 
 
                 if(option==1){
